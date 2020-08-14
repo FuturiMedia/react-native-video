@@ -274,10 +274,6 @@ static int const RCTVideoUnset = -1;
   [[NSNotificationCenter defaultCenter] postNotificationName:@"RCTVideo_progress" object:nil userInfo:@{@"progress": [NSNumber numberWithDouble: currentTimeSecs / duration]}];
     
   if( currentTimeSecs >= 0 && self.onVideoProgress) {
-    if(!_isRequestAds && currentTimeSecs >= 0.0001) {
-      [self requestAds];
-      _isRequestAds = true;
-    }
     self.onVideoProgress(@{
                            @"currentTime": [NSNumber numberWithFloat:CMTimeGetSeconds(currentTime)],
                            @"playableDuration": [self calculatePlayableDuration],
@@ -729,7 +725,7 @@ static int const RCTVideoUnset = -1;
 
 - (void)setupAdsLoader {
   // Re-use this IMAAdsLoader instance for the entire lifecycle of your app.
-  self.adsLoader = [[IMAAdsLoader alloc] initWithSettings:nil];
+  self.adsLoader = [[IMAAdsLoader alloc] init];
   // NOTE: This line will cause a warning until the next step, "Get the Ads Manager".
   self.adsLoader.delegate = self;
 }
@@ -737,12 +733,11 @@ static int const RCTVideoUnset = -1;
 - (void)requestAds {
   // Create an ad display container for ad rendering.
   IMAAdDisplayContainer *adDisplayContainer =
-      [[IMAAdDisplayContainer alloc] initWithAdContainer:self companionSlots:nil];
-  // Create an ad request with our ad tag, display container, and optional user context.
+  [[IMAAdDisplayContainer alloc] initWithAdContainer:self];
   IMAAdsRequest *request = [[IMAAdsRequest alloc] initWithAdTagUrl:_adTagUrl
                                                 adDisplayContainer:adDisplayContainer
-                                                   contentPlayhead:self.contentPlayhead
-                                                       userContext:nil];
+                                                    contentPlayhead:self.contentPlayhead
+                                                        userContext:nil];
   [self.adsLoader requestAdsWithRequest:request];
 }
 
@@ -1409,6 +1404,9 @@ static int const RCTVideoUnset = -1;
     
     [self.layer addSublayer:_playerLayer];
     self.layer.needsDisplayOnBoundsChange = YES;
+
+    [self setupAdsLoader];
+    [self requestAds];
     #if TARGET_OS_IOS
     [self setupPipController];
     #endif
