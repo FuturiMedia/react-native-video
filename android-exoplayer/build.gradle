@@ -31,7 +31,7 @@ dependencies {
     // All support libs must use the same version
     implementation "androidx.annotation:annotation:1.1.0"
     implementation "androidx.core:core:1.1.0"
-    implementation "androidx.media:media:1.1.0"
+    implementation "androidx.media:media:1.0.1"
 
     implementation('com.google.android.exoplayer:extension-okhttp:2.11.2') {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
