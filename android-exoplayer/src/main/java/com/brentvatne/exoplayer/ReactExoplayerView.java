@@ -37,12 +37,14 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceFactory;
 import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.SingleSampleMediaSource;
@@ -84,7 +86,7 @@ class ReactExoplayerView extends FrameLayout implements
         BecomingNoisyListener,
         AudioManager.OnAudioFocusChangeListener,
         MetadataOutput,
-        AdsMediaSource.MediaSourceFactory {
+        MediaSourceFactory {
 
     private static final String TAG = "ReactExoplayerView";
 
@@ -464,6 +466,13 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     // AdsMediaSource.MediaSourceFactory implementation.
+
+    @Override
+    public MediaSourceFactory setDrmSessionManager(DrmSessionManager<?> drmSessionManager) {
+        // no-op to conform to interface. implementing this feature is not necessary for our current use case
+        Log.d(TAG, "setDrmSessionManager is a no-op in this implementation");
+        return this;
+    }
 
     @Override
     public MediaSource createMediaSource(Uri uri) {
@@ -904,7 +913,7 @@ class ReactExoplayerView extends FrameLayout implements
                 // Special case for decoder initialization failures.
                 MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
                         (MediaCodecRenderer.DecoderInitializationException) cause;
-                if (decoderInitializationException.decoderName == null) {
+                if (decoderInitializationException.codecInfo.name == null) {
                     if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
                         errorString = getResources().getString(R.string.error_querying_decoders);
                     } else if (decoderInitializationException.secureDecoderRequired) {
@@ -916,7 +925,7 @@ class ReactExoplayerView extends FrameLayout implements
                     }
                 } else {
                     errorString = getResources().getString(R.string.error_instantiating_decoder,
-                            decoderInitializationException.decoderName);
+                            decoderInitializationException.codecInfo.name);
                 }
             }
         }

@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.source.ads.AdsLoader;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
+import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.SubtitleView;
 import com.google.android.exoplayer2.util.Assertions;
@@ -230,9 +231,9 @@ public final class ExoPlayerView extends FrameLayout implements AdsLoader.AdView
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,
-            TextRenderer.Output, ExoPlayer.EventListener {
+            TextOutput, ExoPlayer.EventListener {
 
-        // TextRenderer.Output implementation
+        // TextOutput implementation
 
         @Override
         public void onCues(List<Cue> cues) {
